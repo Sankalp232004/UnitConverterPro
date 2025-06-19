@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Universal Unit Converter</title>
+  <style>
+    :root {
+      --primary-color: #4a90e2;
+      --accent-color: #50e3c2;
+      --background-light: #f9fafb;
+      --text-dark: #222222;
+      --border-radius: 12px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --btn-shadow: 0 4px 12px rgba(74, 144, 226, 0.45);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background: var(--background-light);
+      color: var(--text-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .converter-container {
+      background: white;
+      max-width: 420px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--btn-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1.1rem;
+      border: 2px solid #ddd;
+      border-radius: var(--border-radius);
+      transition: border-color 0.3s;
+    }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    .result-display {
+      margin-top: 1rem;
+      font-size: 1.4rem;
+      background: #f0f6ff;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      font-weight: 700;
+      color: var(--accent-color);
+      min-height: 2.5rem;
+      transition: opacity 0.5s;
+      opacity: 0; /* Start hidden */
+    }
+    button.convert-btn, button.reset-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 1rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color 0.3s, box-shadow 0.3s ease-in-out;
+    }
+    button.convert-btn:hover {
+      background: var(--accent-color);
+      box-shadow: 0 6px 18px rgba(80, 227, 194, 0.5);
+    }
+    button.reset-btn {
+      background: #e94e77; /* Different color for reset */
+    }
+    button.reset-btn:hover {
+      background: #d43f6b;
+    }
+    @media (max-width: 480px) {
+      .converter-container {
+        padding: 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="converter-container" role="main" aria-labelledby="converter-title">
+    <h1 id="converter-title">Unit Converter</h1>
+    <div>
+      <label for="input-value">Value to Convert</label>
+      <input type="number" id="input-value" placeholder="Enter a number" step="any" />
+    </div>
+    <div>
+      <label for="input-type">From</label>
+      <select id="input-type">
+        <optgroup label="Length">
+          <option value="meters">Meters (m)</option>
+          <option value="kilometers">Kilometers (km)</option>
+          <option value="miles">Miles (mi)</option>
+          <option value="feet">Feet (ft)</option>
+          <option value="inches">Inches (in)</option>
+        </optgroup>
+        <optgroup label="Weight">
+          <option value="grams">Grams (g)</option>
+          <option value="kilograms">Kilograms (kg)</option>
+          <option value="pounds">Pounds (lbs)</option>
+          <option value="ounces">Ounces (oz)</option>
+        </optgroup>
+        <optgroup label="Temperature">
+          <option value="celsius">Celsius (°C)</option>
+          <option value="fahrenheit">Fahrenheit (°F)</option>
+          <option value="kelvin">Kelvin (K)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div>
+      <label for="output-type">To</label>
+      <select id="output-type">
+        <optgroup label="Length">
+          <option value="meters">Meters (m)</option>
+          <option value="kilometers">Kilometers (km)</option>
+          <option value="miles">Miles (mi)</option>
+          <option value="feet">Feet (ft)</option>
+          <option value="inches">Inches (in)</option>
+        </optgroup>
+        <optgroup label="Weight">
+          <option value="grams">Grams (g)</option>
+          <option value="kilograms">Kilograms (kg)</option>
+          <option value="pounds">Pounds (lbs)</option>
+          <option value="ounces">Ounces (oz)</option>
+        </optgroup>
+        <optgroup label="Temperature">
+          <option value="celsius">Celsius (°C)</option>
+          <option value="fahrenheit">Fahrenheit (°F)</option>
+          <option value="kelvin">Kelvin (K)</option>
+        </optgroup>
+      </select>
+    </div>
+    <button class="convert-btn" id="convert-btn">Convert</button>
+    <button class="reset-btn" id="reset-btn">Reset</button>
+    <div class="result-display" id="result" aria-live="polite" aria-atomic="true">Result will appear here</div>
+  </section>
+  <script>
+    const inputValueEl = document.getElementById('input-value');
+    const inputTypeEl = document.getElementById('input-type');
+    const outputTypeEl = document.getElementById('output-type');
+    const convertBtn = document.getElementById('convert-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const resultEl = document.getElementById('result');
+
+    const lengthFactors = {
+      meters: 1,
+      kilometers: 1000,
+      miles: 1609.344,
+      feet: 0.3048,
+      inches: 0.0254,
+    };
+    const weightFactors = {
+      grams: 1,
+      kilograms: 1000,
+      pounds: 453.59237,
+      ounces: 28.3495231,
+    };
+
+    function celsiusToFahrenheit(c) { return (c * 9/5) + 32; }
+    function fahrenheitToCelsius(f) { return (f - 32) * 5/9; }
+    function celsiusToKelvin(c) { return c + 273.15; }
+    function kelvinToCelsius(k) { return k - 273.15; }
+
+    function unitCategory(unit) {
+      if (unit in lengthFactors) return 'length';
+      if (unit in weightFactors) return 'weight';
+      return 'temperature';
+    }
+
+    function convert() {
+      let val = parseFloat(inputValueEl.value);
+      if (isNaN(val)) {
+        resultEl.textContent = "Please enter a valid numeric value.";
+        resultEl.style.opacity = 1; // Show result
+        return;
+      }
+      let fromUnit = inputTypeEl.value;
+      let toUnit = outputTypeEl.value;
+
+      const fromCategory = unitCategory(fromUnit);
+      const toCategory = unitCategory(toUnit);
+
+      if (fromCategory !== toCategory) {
+        resultEl.textContent = "Cannot convert between different unit types.";
+        resultEl.style.opacity = 1; // Show result
+        return;
+      }
+
+      let result;
+
+      if (fromCategory === 'length') {
+        let meters = val * lengthFactors[fromUnit];
+        result = meters / lengthFactors[toUnit];
+      } else if (fromCategory === 'weight') {
+        let grams = val * weightFactors[fromUnit];
+        result = grams / weightFactors[toUnit];
+      } else {
+        let celsiusVal;
+        switch(fromUnit) {
+          case 'celsius': celsiusVal = val; break;
+          case 'fahrenheit': celsiusVal = fahrenheitToCelsius(val); break;
+          case 'kelvin': celsiusVal = kelvinToCelsius(val); break;
+        }
+        switch(toUnit) {
+          case 'celsius': result = celsiusVal; break;
+          case 'fahrenheit': result = celsiusToFahrenheit(celsiusVal); break;
+          case 'kelvin': result = celsiusToKelvin(celsiusVal); break;
+        }
+      }
+
+      resultEl.textContent = `${val} ${fromUnit} = ${parseFloat(result.toFixed(5))} ${toUnit}`;
+      resultEl.style.opacity = 1; // Show result
+    }
+
+    function reset() {
+      inputValueEl.value = '';
+      inputTypeEl.selectedIndex = 0;
+      outputTypeEl.selectedIndex = 0;
+      resultEl.textContent = 'Result will appear here';
+      resultEl.style.opacity = 0; // Hide result
+    }
+
+    convertBtn.addEventListener('click', convert);
+    resetBtn.addEventListener('click', reset);
+  </script>
+</body>
+</html>
