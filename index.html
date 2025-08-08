@@ -72,7 +72,7 @@
       color: var(--accent-color);
       min-height: 2.5rem;
       transition: opacity 0.5s;
-      opacity: 0; /* Start hidden */
+      opacity: 0;
     }
     button.convert-btn, button.reset-btn {
       background: var(--primary-color);
@@ -90,7 +90,7 @@
       box-shadow: 0 6px 18px rgba(80, 227, 194, 0.5);
     }
     button.reset-btn {
-      background: #e94e77; /* Different color for reset */
+      background: #e94e77;
     }
     button.reset-btn:hover {
       background: #d43f6b;
@@ -196,7 +196,7 @@
       let val = parseFloat(inputValueEl.value);
       if (isNaN(val)) {
         resultEl.textContent = "Please enter a valid numeric value.";
-        resultEl.style.opacity = 1; // Show result
+        resultEl.style.opacity = 1;
         return;
       }
       let fromUnit = inputTypeEl.value;
@@ -207,7 +207,7 @@
 
       if (fromCategory !== toCategory) {
         resultEl.textContent = "Cannot convert between different unit types.";
-        resultEl.style.opacity = 1; // Show result
+        resultEl.style.opacity = 1;
         return;
       }
 
@@ -234,7 +234,7 @@
       }
 
       resultEl.textContent = `${val} ${fromUnit} = ${parseFloat(result.toFixed(5))} ${toUnit}`;
-      resultEl.style.opacity = 1; // Show result
+      resultEl.style.opacity = 1;
     }
 
     function reset() {
@@ -242,7 +242,7 @@
       inputTypeEl.selectedIndex = 0;
       outputTypeEl.selectedIndex = 0;
       resultEl.textContent = 'Result will appear here';
-      resultEl.style.opacity = 0; // Hide result
+      resultEl.style.opacity = 0;
     }
 
     convertBtn.addEventListener('click', convert);
